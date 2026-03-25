@@ -1,0 +1,94 @@
+<%
+layout('../admin/layout')
+%>
+
+<h1 class="admin-page-title">DASHBOARD</h1>
+
+<!-- STATS -->
+<div class="stat-grid">
+  <div class="stat-card">
+    <div class="stat-value" style="color:var(--red)"><%= stats.articles %></div>
+    <div class="stat-label">Total Posts</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value" style="color:var(--teal)"><%= stats.published %></div>
+    <div class="stat-label">Published</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value" style="color:var(--gold)"><%= stats.videos %></div>
+    <div class="stat-label">Videos</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value" style="color:var(--purple)"><%= stats.users %></div>
+    <div class="stat-label">Members</div>
+  </div>
+</div>
+
+<!-- QUICK ACTIONS -->
+<div style="display:flex;gap:12px;margin-bottom:32px;flex-wrap:wrap">
+  <a href="/admin/articles/new" class="btn btn-primary">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    New Post
+  </a>
+  <a href="/admin/videos/new" class="btn btn-outline">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+    Add Video
+  </a>
+  <% if (user.role === 'admin') { %>
+  <a href="/admin/users" class="btn btn-outline">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+    Manage Users
+  </a>
+  <% } %>
+</div>
+
+<!-- RECENT ARTICLES TABLE -->
+<h2 style="font-family:var(--font-condensed);font-size:16px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-3);margin-bottom:16px">
+  Recent Posts
+</h2>
+
+<% if (recentArticles.length) { %>
+<table class="admin-table">
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Category</th>
+      <th>Author</th>
+      <th>Status</th>
+      <th>Views</th>
+      <th>Date</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% recentArticles.forEach(a => { %>
+    <tr>
+      <td style="max-width:280px">
+        <div style="font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><%= a.title %></div>
+      </td>
+      <td><%= a.cat_name || '—' %></td>
+      <td style="font-size:13px;color:var(--text-2)"><%= a.author_name || '—' %></td>
+      <td><span class="status-badge status-<%= a.status %>"><%= a.status %></span></td>
+      <td style="font-size:13px">👁 <%= a.views %></td>
+      <td style="font-size:12px;color:var(--text-3)"><%= formatDate(a.created_at) %></td>
+      <td>
+        <div style="display:flex;gap:6px">
+          <a href="/admin/articles/<%= a.id %>/edit" class="btn btn-ghost btn-sm">Edit</a>
+          <% if (a.status === 'published') { %>
+            <a href="/articles/<%= a.slug %>" target="_blank" class="btn btn-outline btn-sm">View</a>
+          <% } %>
+          <form action="/admin/articles/<%= a.id %>/delete" method="POST" style="display:inline">
+            <button type="submit" class="btn btn-sm" style="background:rgba(232,23,46,0.1);color:var(--red);border:1px solid rgba(232,23,46,0.2)"
+              data-confirm="Delete '<%= a.title %>'? This cannot be undone.">Delete</button>
+          </form>
+        </div>
+      </td>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>
+<% } else { %>
+  <div class="empty-state" style="padding:40px">
+    <p>No articles yet. <a href="/admin/articles/new" style="color:var(--red)">Drop the community's first post!</a></p>
+  </div>
+<% } %>

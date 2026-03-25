@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title + ' | ' + (settings.site_name || 'WWG Media') : (settings.site_name || 'WWG Media') %></title>
+  <meta name="description" content="<%= settings.site_description || 'East African gaming media' %>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" href="/img/wwg_favicon.png" type="image/png">
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">
+      <img src="/img/wwg_white_logo.png" alt="Watu wa Gaming" height="22" class="wwg-logo">
+    </a>
+
+    <button class="nav-menu-toggle" aria-label="Menu">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+
+    <ul class="nav-links">
+      <li><a href="/" class="<%= typeof activePage !== 'undefined' && activePage === 'home' ? 'active' : '' %>">Home</a></li>
+      <li><a href="/articles" class="<%= typeof activePage !== 'undefined' && activePage === 'articles' ? 'active' : '' %>">Posts</a></li>
+      <li><a href="/articles?category=reviews" class="<%= typeof activePage !== 'undefined' && activePage === 'reviews' ? 'active' : '' %>">Reviews</a></li>
+      <li><a href="/articles?category=hot-takes" class="<%= typeof activePage !== 'undefined' && activePage === 'hot-takes' ? 'active' : '' %>">Hot Takes</a></li>
+      <li><a href="/videos" class="<%= typeof activePage !== 'undefined' && activePage === 'videos' ? 'active' : '' %>">Videos</a></li>
+    </ul>
+
+    <div class="nav-actions">
+      <% if (user) { %>
+        <a href="/profile" class="nav-user">
+          <div class="avatar-sm">
+            <% if (user.avatar) { %><img src="<%= user.avatar %>" alt=""><% } else { %><%= user.username[0].toUpperCase() %><% } %>
+          </div>
+          <span style="font-size:14px;color:var(--text-2)"><%= user.display_name || user.username %></span>
+        </a>
+        <% if (['writer','admin'].includes(user.role)) { %>
+          <a href="/admin" class="btn btn-outline btn-sm">Dashboard</a>
+        <% } %>
+        <a href="/sign-out" class="btn btn-ghost btn-sm">Sign Out</a>
+      <% } else { %>
+        <a href="/sign-in" class="btn btn-outline btn-sm">Sign In</a>
+        <a href="/sign-up" class="btn btn-primary btn-sm">Join WWG</a>
+      <% } %>
+    </div>
+  </div>
+</nav>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker-inner">
+    <span class="ticker-item">What are you playing right now?</span>
+    <span class="ticker-item">Share your hot takes · No cap allowed</span>
+    <span class="ticker-item">Kenya · Uganda · Tanzania · Rwanda · EA gamers unite</span>
+    <span class="ticker-item">Drop your recommendations</span>
+    <span class="ticker-item">Find your people on Discord</span>
+    <span class="ticker-item">Real gamers · Real opinions · Good vibes only</span>
+    <!-- duplicate for seamless loop -->
+    <span class="ticker-item">What are you playing right now?</span>
+    <span class="ticker-item">Share your hot takes · No cap allowed</span>
+    <span class="ticker-item">Kenya · Uganda · Tanzania · Rwanda · EA gamers unite</span>
+    <span class="ticker-item">Drop your recommendations</span>
+    <span class="ticker-item">Find your people on Discord</span>
+    <span class="ticker-item">Real gamers · Real opinions · Good vibes only</span>
+  </div>
+</div>
+
+<!-- PAGE CONTENT -->
+<%- body %>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div style="margin-bottom:16px">
+          <img src="/img/wwg_white_logo.png" alt="Watu wa Gaming" class="wwg-logo" style="height:26px;width:auto;display:block">
+        </div>
+        <p style="font-size:14px;color:var(--text-2);line-height:1.7"><%= settings.site_description || "East Africa's home for gaming opinions, reviews, and culture." %></p>
+        <div style="display:flex;gap:12px;margin-top:16px;flex-wrap:wrap">
+          <% if(settings.discord_url) { %><a href="<%= settings.discord_url %>" target="_blank" style="color:var(--text-3);font-size:13px;transition:color 0.2s" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--text-3)'">Discord</a><% } %>
+          <% if(settings.twitter_url) { %><a href="<%= settings.twitter_url %>" target="_blank" style="color:var(--text-3);font-size:13px;transition:color 0.2s" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--text-3)'">Twitter/X</a><% } %>
+          <% if(settings.youtube_url) { %><a href="<%= settings.youtube_url %>" target="_blank" style="color:var(--text-3);font-size:13px;transition:color 0.2s" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--text-3)'">YouTube</a><% } %>
+          <% if(settings.instagram_url) { %><a href="<%= settings.instagram_url %>" target="_blank" style="color:var(--text-3);font-size:13px;transition:color 0.2s" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--text-3)'">Instagram</a><% } %>
+          <% if(settings.tiktok_url) { %><a href="<%= settings.tiktok_url %>" target="_blank" style="color:var(--text-3);font-size:13px;transition:color 0.2s" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--text-3)'">TikTok</a><% } %>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="/articles?category=reviews">Game Reviews</a></li>
+          <li><a href="/articles?category=hot-takes">Hot Takes</a></li>
+          <li><a href="/articles?category=tips-tricks">Tips & Tricks</a></li>
+          <li><a href="/articles?category=currently-playing">Currently Playing</a></li>
+          <li><a href="/videos">Videos</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Community</h4>
+        <ul>
+          <% if(settings.discord_url) { %><li><a href="<%= settings.discord_url %>" target="_blank">Discord Server</a></li><% } %>
+          <li><a href="/sign-up">Join the Community</a></li>
+          <li><a href="/articles">Browse Posts</a></li>
+          <li><a href="/videos">Watch Videos</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>About</h4>
+        <ul>
+          <li><a href="#">About WWG</a></li>
+          <li><a href="#">Post Guidelines</a></li>
+          <li><a href="#">Contact</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 Watu wa Gaming Media. All rights reserved.</span>
+      <span class="accent">East Africa's Gaming Community</span>
+    </div>
+  </div>
+</footer>
+
+<!-- TOAST -->
+<div id="toast" class="toast"></div>
+
+<!-- VIDEO MODAL -->
+<div id="video-modal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title"></span>
+      <button class="modal-close" id="modal-close">✕</button>
+    </div>
+    <div class="modal-video">
+      <iframe id="modal-frame" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+    </div>
+  </div>
+</div>
+
+<script src="/js/main.js"></script>
+</body>
+</html>

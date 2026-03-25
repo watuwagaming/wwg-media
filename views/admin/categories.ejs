@@ -1,0 +1,113 @@
+<%
+layout('../admin/layout')
+%>
+
+<h1 class="admin-page-title">CATEGORIES</h1>
+<p style="color:var(--text-2);margin-bottom:28px;font-size:15px">Manage the categories that articles are grouped under.</p>
+
+<% if (error) { %>
+  <div class="form-error" style="max-width:700px"><%= error %></div>
+<% } %>
+<% if (success) { %>
+  <div style="background:rgba(0,201,167,0.1);border:1px solid rgba(0,201,167,0.3);border-radius:6px;padding:14px 18px;margin-bottom:24px;color:var(--teal);font-size:14px;max-width:700px">
+    ✅ <%= success %>
+  </div>
+<% } %>
+
+<div style="display:grid;grid-template-columns:1fr 340px;gap:32px;max-width:900px;align-items:start">
+
+  <!-- EXISTING CATEGORIES -->
+  <div>
+    <h3 style="font-family:var(--font-condensed);font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-3);margin-bottom:16px">Existing Categories (<%= categories.length %>)</h3>
+
+    <% if (categories.length) { %>
+      <% categories.forEach(c => { %>
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:16px 20px;margin-bottom:10px;display:flex;align-items:center;gap:16px">
+        <div style="width:14px;height:14px;border-radius:50%;background:<%= c.color %>;flex-shrink:0;border:2px solid rgba(255,255,255,0.1)"></div>
+        <div style="flex:1">
+          <div style="font-family:var(--font-condensed);font-weight:700;font-size:15px"><%= c.name %></div>
+          <div style="font-size:12px;color:var(--text-3)">/<%= c.slug %> <% if(c.description) { %>· <%= c.description %><% } %></div>
+        </div>
+
+        <!-- INLINE EDIT FORM -->
+        <details style="position:relative">
+          <summary class="btn btn-ghost btn-sm" style="cursor:pointer;list-style:none">Edit</summary>
+          <div style="position:absolute;right:0;top:calc(100% + 8px);width:280px;background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;padding:16px;z-index:10;box-shadow:0 8px 32px rgba(0,0,0,0.4)">
+            <form action="/admin/categories/<%= c.id %>/edit" method="POST">
+              <div class="form-group">
+                <label class="form-label">Name</label>
+                <input class="form-input" type="text" name="name" value="<%= c.name %>" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Colour</label>
+                <div style="display:flex;gap:8px;align-items:center">
+                  <input type="color" name="color" value="<%= c.color %>" style="width:44px;height:36px;padding:2px;background:var(--bg-card);border:1px solid var(--border);border-radius:4px;cursor:pointer">
+                  <input class="form-input" type="text" name="color" value="<%= c.color %>" placeholder="#a3003a" style="font-family:monospace;font-size:13px">
+                </div>
+              </div>
+              <div class="form-group" style="margin-bottom:12px">
+                <label class="form-label">Description</label>
+                <input class="form-input" type="text" name="description" value="<%= c.description %>" placeholder="Optional...">
+              </div>
+              <button type="submit" class="btn btn-primary btn-sm" style="width:100%;justify-content:center">Save Changes</button>
+            </form>
+          </div>
+        </details>
+
+        <form action="/admin/categories/<%= c.id %>/delete" method="POST" style="display:inline">
+          <button type="submit" class="btn btn-sm"
+            style="background:rgba(232,23,46,0.1);color:var(--crimson);border:1px solid rgba(232,23,46,0.2)"
+            data-confirm="Delete category '<%= c.name %>'? Articles in this category will become uncategorised.">
+            Delete
+          </button>
+        </form>
+      </div>
+      <% }) %>
+    <% } else { %>
+      <div style="text-align:center;padding:40px;color:var(--text-3);background:var(--bg-card);border:1px solid var(--border);border-radius:6px">
+        No categories yet. Add one using the form.
+      </div>
+    <% } %>
+  </div>
+
+  <!-- ADD NEW CATEGORY -->
+  <div style="position:sticky;top:80px">
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:24px">
+      <h3 style="font-family:var(--font-condensed);font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:20px">Add New Category</h3>
+
+      <form action="/admin/categories/new" method="POST">
+        <div class="form-group">
+          <label class="form-label">Name *</label>
+          <input class="form-input" type="text" name="name" placeholder="e.g. Hardware" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Badge Colour</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="color" name="color" value="#a3003a" style="width:44px;height:36px;padding:2px;background:var(--bg-card);border:1px solid var(--border);border-radius:4px;cursor:pointer">
+            <input class="form-input" type="text" value="#a3003a" placeholder="#a3003a" style="font-family:monospace;font-size:13px" readonly>
+          </div>
+          <p style="font-size:12px;color:var(--text-3);margin-top:4px">Shown on article cards next to the category name.</p>
+        </div>
+
+        <div class="form-group" style="margin-bottom:20px">
+          <label class="form-label">Description</label>
+          <input class="form-input" type="text" name="description" placeholder="Optional short description">
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center">Add Category</button>
+      </form>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// Sync color picker with text input
+document.querySelectorAll('input[type="color"]').forEach(picker => {
+  picker.addEventListener('input', () => {
+    const sibling = picker.nextElementSibling;
+    if (sibling && sibling.type === 'text') sibling.value = picker.value;
+  });
+});
+</script>

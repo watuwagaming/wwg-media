@@ -1,0 +1,48 @@
+<div class="container" style="padding-top:40px;padding-bottom:60px">
+
+  <div class="page-header">
+    <h1>VIDEOS</h1>
+    <p style="color:var(--text-2);font-size:15px"><%= total %> video<%= total !== 1 ? 's' : '' %> available</p>
+  </div>
+
+  <% if (videos.length) { %>
+    <div class="card-grid card-grid-3">
+      <% videos.forEach(v => { %>
+      <div class="video-card" data-video="<%= v.youtube_id %>" data-title="<%= v.title %>" style="cursor:pointer">
+        <div class="video-thumb">
+          <img src="<%= v.thumbnail || `https://img.youtube.com/vi/${v.youtube_id}/hqdefault.jpg` %>" alt="<%= v.title %>" loading="lazy">
+          <div class="play-btn"></div>
+        </div>
+        <div class="video-body">
+          <div class="video-title"><%= v.title %></div>
+          <% if (v.description) { %>
+            <div style="font-size:13px;color:var(--text-2);margin:6px 0;line-height:1.5"><%= excerpt(v.description, 80) %></div>
+          <% } %>
+          <div class="video-meta"><%= v.author_name || 'WWG' %> • <%= timeAgo(v.created_at) %></div>
+        </div>
+      </div>
+      <% }) %>
+    </div>
+
+    <!-- PAGINATION -->
+    <% if (pages > 1) { %>
+    <div class="pagination">
+      <% if (page > 1) { %><a href="?page=<%= page-1 %>" class="page-link">‹</a><% } %>
+      <% for (let i = 1; i <= pages; i++) { %>
+        <a href="?page=<%= i %>" class="page-link <%= page === i ? 'active' : '' %>"><%= i %></a>
+      <% } %>
+      <% if (page < pages) { %><a href="?page=<%= page+1 %>" class="page-link">›</a><% } %>
+    </div>
+    <% } %>
+
+  <% } else { %>
+    <div class="empty-state">
+      <h3>HAKUNA VIDEOS</h3>
+      <p>No videos yet. Add some YouTube videos in the admin dashboard.</p>
+      <% if (user && ['writer','admin'].includes(user.role)) { %>
+        <a href="/admin/videos/new" class="btn btn-primary" style="margin-top:16px">Add Video</a>
+      <% } %>
+    </div>
+  <% } %>
+
+</div>

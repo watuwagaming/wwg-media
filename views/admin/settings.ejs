@@ -1,0 +1,107 @@
+<%
+layout('../admin/layout')
+%>
+
+<h1 class="admin-page-title">SITE SETTINGS</h1>
+<p style="color:var(--text-2);margin-bottom:28px;font-size:15px">Change your site name, social links, and other global settings here. No coding needed.</p>
+
+<% if (typeof query !== 'undefined' && query?.saved) { %>
+  <div style="background:rgba(0,201,167,0.1);border:1px solid rgba(0,201,167,0.3);border-radius:6px;padding:14px 18px;margin-bottom:24px;color:var(--teal);font-size:14px;display:flex;align-items:center;gap:10px">
+    ✅ Settings saved successfully!
+  </div>
+<% } %>
+
+<form action="/admin/settings" method="POST">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:900px">
+
+    <!-- LEFT COLUMN -->
+    <div>
+
+      <!-- SITE IDENTITY -->
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:24px;margin-bottom:20px">
+        <h3 style="font-family:var(--font-condensed);font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:20px">Site Identity</h3>
+
+        <div class="form-group">
+          <label class="form-label">Site Name</label>
+          <input class="form-input" type="text" name="site_name" value="<%= settings.site_name %>" placeholder="WWG Media">
+          <p style="font-size:12px;color:var(--text-3);margin-top:4px">Appears in the browser tab and page titles.</p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Tagline</label>
+          <input class="form-input" type="text" name="site_tagline" value="<%= settings.site_tagline %>" placeholder="East Africa's Gaming Voice">
+          <p style="font-size:12px;color:var(--text-3);margin-top:4px">Short phrase shown under the logo on some pages.</p>
+        </div>
+
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Site Description</label>
+          <textarea class="form-textarea" name="site_description" style="min-height:80px" placeholder="East Africa's home for gaming opinions..."><%= settings.site_description %></textarea>
+          <p style="font-size:12px;color:var(--text-3);margin-top:4px">Shown in the footer and used by search engines.</p>
+        </div>
+      </div>
+
+      <!-- HOMEPAGE CTA -->
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:24px">
+        <h3 style="font-family:var(--font-condensed);font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:20px">Homepage Button</h3>
+        <p style="font-size:13px;color:var(--text-2);margin-bottom:16px">The call-to-action button shown on the homepage when there is no featured article.</p>
+
+        <div class="form-group">
+          <label class="form-label">Button Text</label>
+          <input class="form-input" type="text" name="hero_cta_text" value="<%= settings.hero_cta_text %>" placeholder="Join WWG">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Button Link</label>
+          <input class="form-input" type="text" name="hero_cta_url" value="<%= settings.hero_cta_url %>" placeholder="/register">
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div>
+
+      <!-- SOCIAL LINKS -->
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:24px;margin-bottom:20px">
+        <h3 style="font-family:var(--font-condensed);font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:20px">Social Media Links</h3>
+        <p style="font-size:13px;color:var(--text-2);margin-bottom:16px">Paste full URLs. Leave blank to hide the link.</p>
+
+        <div class="form-group">
+          <label class="form-label">Discord Invite URL</label>
+          <input class="form-input" type="url" name="discord_url" value="<%= settings.discord_url %>" placeholder="https://discord.gg/...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Twitter / X</label>
+          <input class="form-input" type="url" name="twitter_url" value="<%= settings.twitter_url %>" placeholder="https://twitter.com/wwgaming">
+        </div>
+        <div class="form-group">
+          <label class="form-label">YouTube Channel</label>
+          <input class="form-input" type="url" name="youtube_url" value="<%= settings.youtube_url %>" placeholder="https://youtube.com/@wwgaming">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Instagram</label>
+          <input class="form-input" type="url" name="instagram_url" value="<%= settings.instagram_url %>" placeholder="https://instagram.com/wwgaming">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">TikTok</label>
+          <input class="form-input" type="url" name="tiktok_url" value="<%= settings.tiktok_url %>" placeholder="https://tiktok.com/@wwgaming">
+        </div>
+      </div>
+
+      <!-- FOOTER -->
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:24px">
+        <h3 style="font-family:var(--font-condensed);font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:20px">Footer</h3>
+
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Footer Tagline</label>
+          <input class="form-input" type="text" name="footer_text" value="<%= settings.footer_text %>" placeholder="East Africa's Gaming Community">
+          <p style="font-size:12px;color:var(--text-3);margin-top:4px">Small text shown at the bottom of every page.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SAVE BUTTON -->
+  <div style="margin-top:24px;max-width:900px;display:flex;align-items:center;gap:12px">
+    <button type="submit" class="btn btn-primary btn-lg">Save Settings</button>
+    <span style="font-size:13px;color:var(--text-3)">Changes apply immediately — no restart needed.</span>
+  </div>
+</form>

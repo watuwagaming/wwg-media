@@ -1,0 +1,67 @@
+<div class="container" style="padding-top:40px;padding-bottom:60px">
+
+  <!-- PROFILE HEADER -->
+  <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:32px;margin-bottom:40px;display:flex;gap:24px;align-items:center;flex-wrap:wrap">
+    <div style="width:80px;height:80px;border-radius:50%;background:var(--bg-hover);border:3px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;color:var(--red);overflow:hidden;flex-shrink:0">
+      <% if (profileUser.avatar) { %>
+        <img src="<%= profileUser.avatar %>" alt="" style="width:100%;height:100%;object-fit:cover">
+      <% } else { %>
+        <%= initial(profileUser.display_name || profileUser.username) %>
+      <% } %>
+    </div>
+    <div style="flex:1">
+      <div style="font-family:var(--font-display);font-size:32px;letter-spacing:2px"><%= profileUser.display_name || profileUser.username %></div>
+      <div style="color:var(--text-3);font-family:var(--font-condensed);font-size:14px;margin-bottom:8px">@<%= profileUser.username %>
+        <span style="margin-left:12px;padding:2px 8px;background:<%= profileUser.role === 'admin' ? 'var(--red)' : profileUser.role === 'writer' ? 'rgba(167,139,250,0.15)' : 'var(--bg-hover)' %>;color:<%= profileUser.role === 'admin' ? '#fff' : profileUser.role === 'writer' ? 'var(--purple)' : 'var(--text-3)' %>;border-radius:3px;font-size:11px;letter-spacing:1px;text-transform:uppercase"><%= profileUser.role %></span>
+      </div>
+      <% if (profileUser.bio) { %>
+        <p style="color:var(--text-2);font-size:14px"><%= profileUser.bio %></p>
+      <% } %>
+    </div>
+    <div style="text-align:right">
+      <div style="font-family:var(--font-display);font-size:28px;color:var(--red)"><%= articles.length %></div>
+      <div style="font-size:12px;color:var(--text-3);font-family:var(--font-condensed);text-transform:uppercase;letter-spacing:1px">Posts</div>
+      <div style="margin-top:8px;font-size:12px;color:var(--text-3)">Member since <%= formatDate(profileUser.created_at) %></div>
+    </div>
+  </div>
+
+  <!-- ARTICLES -->
+  <h2 class="section-title" style="font-size:20px"><span>ARTICLES</span> BY <%= (profileUser.display_name || profileUser.username).toUpperCase() %></h2>
+
+  <% if (articles.length) { %>
+    <div class="card-grid">
+      <% articles.forEach(a => { %>
+      <a href="<%= a.status === 'published' ? '/articles/' + a.slug : '#' %>">
+        <article class="article-card" style="<%= a.status !== 'published' ? 'opacity:0.6' : '' %>">
+          <div class="card-thumb">
+            <% if (a.cover_image) { %>
+              <img src="<%= a.cover_image %>" alt="<%= a.title %>" loading="lazy">
+            <% } else { %>
+              <div class="card-thumb-placeholder">🎮</div>
+            <% } %>
+          </div>
+          <div class="card-body">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+              <% if (a.cat_name) { %>
+                <span class="cat-badge" style="background:<%= a.cat_color %>20;color:<%= a.cat_color %>"><%= a.cat_name %></span>
+              <% } %>
+              <span class="status-badge status-<%= a.status %>"><%= a.status %></span>
+            </div>
+            <h3 class="card-title"><%= a.title %></h3>
+            <div class="card-meta">
+              <span><%= timeAgo(a.created_at) %></span>
+              <% if (a.status === 'published') { %><span style="margin-left:auto">👁 <%= a.views %></span><% } %>
+            </div>
+          </div>
+        </article>
+      </a>
+      <% }) %>
+    </div>
+  <% } else { %>
+    <div class="empty-state">
+      <h3>NO POSTS YET</h3>
+      <p>Nothing posted yet.</p>
+    </div>
+  <% } %>
+
+</div>

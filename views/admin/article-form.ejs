@@ -1,0 +1,159 @@
+<%
+layout('../admin/layout')
+const isEdit = !!article
+%>
+
+<!-- Quill rich text editor (loads from CDN, no install needed) -->
+<link href="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.snow.css" rel="stylesheet">
+<style>
+  /* Dark theme for Quill */
+  .ql-toolbar.ql-snow {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-bottom: none;
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+  .ql-toolbar.ql-snow .ql-stroke { stroke: var(--text-2); }
+  .ql-toolbar.ql-snow .ql-fill { fill: var(--text-2); }
+  .ql-toolbar.ql-snow .ql-picker-label { color: var(--text-2); }
+  .ql-toolbar.ql-snow button:hover .ql-stroke,
+  .ql-toolbar.ql-snow .ql-active .ql-stroke { stroke: var(--gold); }
+  .ql-toolbar.ql-snow button:hover .ql-fill,
+  .ql-toolbar.ql-snow .ql-active .ql-fill { fill: var(--gold); }
+  .ql-toolbar.ql-snow .ql-picker-options {
+    background: var(--bg-card); border-color: var(--border);
+  }
+  .ql-toolbar.ql-snow .ql-picker-item { color: var(--text-1); }
+  .ql-container.ql-snow {
+    border: 1px solid var(--border);
+    border-radius: 0 0 var(--radius) var(--radius);
+    font-family: var(--font-body);
+    font-size: 16px;
+  }
+  .ql-editor { min-height: 400px; color: var(--text-1); line-height: 1.8; }
+  .ql-editor.ql-blank::before { color: var(--text-3); font-style: normal; }
+  .ql-editor h1, .ql-editor h2 { font-family: var(--font-display); letter-spacing: 1px; }
+  .ql-editor blockquote {
+    border-left: 4px solid var(--crimson);
+    background: var(--bg-card);
+    padding: 12px 16px; color: var(--text-2);
+  }
+</style>
+
+<div style="max-width:900px">
+  <h1 class="admin-page-title"><%= isEdit ? 'EDIT POST' : 'NEW POST' %></h1>
+
+  <% if (error) { %>
+    <div class="form-error"><%= error %></div>
+  <% } %>
+
+  <form action="/admin/articles/<%= isEdit ? article.id + '/edit' : 'new' %>" method="POST" enctype="multipart/form-data">
+
+    <div style="display:grid;grid-template-columns:1fr 320px;gap:24px;align-items:start">
+
+      <!-- LEFT -->
+      <div>
+        <div class="form-group">
+          <label class="form-label">Title *</label>
+          <input class="form-input" type="text" name="title" value="<%= isEdit ? article.title : '' %>" placeholder="What are you posting about?..." required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Excerpt / Summary *</label>
+          <textarea class="form-textarea" name="excerpt" style="min-height:80px" placeholder="Give people a reason to click — keep it casual..." required><%= isEdit ? article.excerpt : '' %></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Article Body *</label>
+
+          <!-- Quill editor container -->
+          <div id="quill-editor" style="min-height:420px;background:var(--bg-surface);border:1px solid var(--border);border-radius:0 0 var(--radius) var(--radius);color:var(--text-1);font-size:16px"></div>
+
+          <!-- Hidden textarea that gets submitted -->
+          <textarea id="article-body" name="body" style="display:none" required><%= isEdit ? article.body : '' %></textarea>
+          <p style="font-size:12px;color:var(--text-3);margin-top:6px">Use the toolbar to format your post. Bold, headings, lists — no coding needed. Just write like you talk.</p>
+        </div>
+      </div>
+
+      <!-- RIGHT SIDEBAR -->
+      <div style="position:sticky;top:80px">
+
+        <!-- PUBLISH -->
+        <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:20px;margin-bottom:16px">
+          <div style="font-family:var(--font-condensed);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-3);margin-bottom:14px">Publish</div>
+
+          <div class="form-group">
+            <label class="form-label">Status</label>
+            <select class="form-select" name="status">
+              <option value="draft" <%= !isEdit || article.status === 'draft' ? 'selected' : '' %>>Draft</option>
+              <option value="published" <%= isEdit && article.status === 'published' ? 'selected' : '' %>>Published</option>
+            </select>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+            <input type="checkbox" name="featured" id="featured" value="1"
+              <%= isEdit && article.featured ? 'checked' : '' %>
+              style="width:16px;height:16px;accent-color:var(--red)">
+            <label for="featured" style="font-size:14px;cursor:pointer">Pin to homepage</label>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center">
+            <%= isEdit ? 'Update Post' : 'Save Post' %>
+          </button>
+          <a href="/admin" class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;margin-top:8px">Cancel</a>
+        </div>
+
+        <!-- CATEGORY -->
+        <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:20px;margin-bottom:16px">
+          <div style="font-family:var(--font-condensed);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-3);margin-bottom:14px">Category</div>
+          <select class="form-select" name="category_id">
+            <option value="">No category</option>
+            <% categories.forEach(c => { %>
+              <option value="<%= c.id %>" <%= isEdit && article.category_id === c.id ? 'selected' : '' %>><%= c.name %></option>
+            <% }) %>
+          </select>
+        </div>
+
+        <!-- COVER IMAGE -->
+        <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:20px">
+          <div style="font-family:var(--font-condensed);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-3);margin-bottom:14px">Cover Image</div>
+          <% if (isEdit && article.cover_image) { %>
+            <img src="<%= article.cover_image %>" style="width:100%;border-radius:4px;margin-bottom:12px;aspect-ratio:16/9;object-fit:cover">
+            <p style="font-size:12px;color:var(--text-3);margin-bottom:8px">Upload a new image to replace</p>
+          <% } %>
+          <input type="file" name="cover_image" accept="image/*" style="width:100%;font-size:13px;color:var(--text-2)">
+          <p style="font-size:11px;color:var(--text-3);margin-top:6px">Max 5MB. JPG, PNG, WebP recommended. 16:9 ratio ideal.</p>
+        </div>
+
+      </div>
+    </div>
+  </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.js"></script>
+<script>
+const quill = new Quill('#quill-editor', {
+  theme: 'snow',
+  placeholder: 'Write your post here. Use the toolbar to add headings, bold text, quotes, and lists...',
+  modules: {
+    toolbar: [
+      [{ header: [2, 3, false] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      ['blockquote'],
+      [{ list: 'ordered' }, { list: 'bullet' }],
+      ['link'],
+      ['clean']
+    ]
+  }
+});
+
+// Load existing content if editing
+<% if (isEdit && article.body) { %>
+  quill.root.innerHTML = `<%- article.body.replace(/`/g, '\\`') %>`;
+<% } %>
+
+// Before form submit, copy Quill HTML into the hidden textarea
+document.querySelector('form').addEventListener('submit', () => {
+  document.getElementById('article-body').value = quill.root.innerHTML;
+});
+</script>

@@ -1,0 +1,174 @@
+<%
+// Homepage — index.ejs
+%>
+
+<!-- HERO FEATURED POST -->
+<% if (featured) { %>
+<a href="/articles/<%= featured.slug %>">
+  <div class="hero">
+    <div class="hero-bg" style="background-image: url('<%= featured.cover_image || '/img/placeholder.jpg' %>')"></div>
+    <div class="hero-content">
+      <% if (featured.cat_name) { %>
+        <span class="cat-badge" style="background:<%= featured.cat_color %>20;color:<%= featured.cat_color %>;border:1px solid <%= featured.cat_color %>40">
+          <%= featured.cat_name %>
+        </span>
+      <% } %>
+      <h1 class="hero-title"><%= featured.title %></h1>
+      <p class="hero-excerpt"><%= excerpt(featured.excerpt, 160) %></p>
+      <div class="hero-meta">
+        <span>Posted by <%= featured.author_name || 'WWG Community' %></span>
+        <span>•</span>
+        <span><%= timeAgo(featured.published_at) %></span>
+        <span>•</span>
+        <span><%= featured.views %> views</span>
+      </div>
+    </div>
+  </div>
+</a>
+<% } else { %>
+<div class="hero" style="min-height:300px;align-items:center;justify-content:center;text-align:center">
+  <div class="hero-bg" style="background:linear-gradient(135deg, #0d0d18 0%, #1a1a2e 100%)"></div>
+  <div class="hero-content" style="max-width:640px;text-align:center;margin:0 auto">
+    <img src="/img/wwg_white_logo.png" alt="WWG" class="wwg-logo" style="height:44px;width:auto;margin:0 auto 24px;display:block">
+    <h1 class="hero-title" style="font-size:44px">YOUR GAMING COMMUNITY</h1>
+    <p class="hero-excerpt">A space for East African gamers to share what they are playing, drop hot takes, and connect with people who get it.</p>
+    <% if (user && ['writer','admin'].includes(user.role)) { %>
+      <a href="/admin/articles/new" class="btn btn-primary btn-lg" style="margin-top:16px">Drop Your First Post</a>
+    <% } else { %>
+      <a href="/sign-up" class="btn btn-primary btn-lg" style="margin-top:16px">Join the Community</a>
+    <% } %>
+  </div>
+</div>
+<% } %>
+
+<!-- MAIN CONTENT -->
+<div class="container">
+  <div class="home-grid">
+
+    <!-- LEFT: LATEST POSTS + VIDEOS -->
+    <div>
+
+      <!-- LATEST POSTS -->
+      <section style="padding-top:40px">
+        <h2 class="section-title"><span>FRESH</span> POSTS</h2>
+        <% if (latest.length) { %>
+          <div class="card-grid">
+            <% latest.forEach(a => { %>
+            <a href="/articles/<%= a.slug %>">
+              <article class="article-card">
+                <div class="card-thumb">
+                  <% if (a.cover_image) { %>
+                    <img src="<%= a.cover_image %>" alt="<%= a.title %>" loading="lazy">
+                  <% } else { %>
+                    <div class="card-thumb-placeholder">🎮</div>
+                  <% } %>
+                </div>
+                <div class="card-body">
+                  <% if (a.cat_name) { %>
+                    <span class="cat-badge" style="background:<%= a.cat_color %>20;color:<%= a.cat_color %>"><%= a.cat_name %></span>
+                  <% } %>
+                  <h3 class="card-title"><%= a.title %></h3>
+                  <p class="card-excerpt"><%= excerpt(a.excerpt) %></p>
+                  <div class="card-meta">
+                    <span><%= a.author_name || 'Community' %></span>
+                    <span>•</span>
+                    <span><%= timeAgo(a.published_at) %></span>
+                    <span>•</span>
+                    <span>👁 <%= a.views %></span>
+                  </div>
+                </div>
+              </article>
+            </a>
+            <% }) %>
+          </div>
+          <div style="text-align:center;margin-top:28px">
+            <a href="/articles" class="btn btn-outline">See All Posts</a>
+          </div>
+        <% } else { %>
+          <div class="empty-state">
+            <h3>NO POSTS YET</h3>
+            <p>Nothing here yet — be the first one to post something. Tell us what you are playing!</p>
+            <% if (user && ['writer','admin'].includes(user.role)) { %>
+              <a href="/admin/articles/new" class="btn btn-primary" style="margin-top:16px">Post Something</a>
+            <% } else { %>
+              <a href="/sign-up" class="btn btn-primary" style="margin-top:16px">Join & Post</a>
+            <% } %>
+          </div>
+        <% } %>
+      </section>
+
+      <!-- VIDEOS SECTION -->
+      <% if (featuredVideos.length) { %>
+      <section style="padding-top:48px">
+        <h2 class="section-title"><span>COMMUNITY</span> VIDEOS</h2>
+        <div class="card-grid card-grid-3">
+          <% featuredVideos.forEach(v => { %>
+          <div class="video-card" data-video="<%= v.youtube_id %>" data-title="<%= v.title %>" style="cursor:pointer">
+            <div class="video-thumb">
+              <img src="<%= v.thumbnail || `https://img.youtube.com/vi/${v.youtube_id}/hqdefault.jpg` %>" alt="<%= v.title %>" loading="lazy">
+              <div class="play-btn"></div>
+            </div>
+            <div class="video-body">
+              <div class="video-title"><%= v.title %></div>
+              <div class="video-meta"><%= v.author_name || 'WWG' %> • <%= timeAgo(v.created_at) %></div>
+            </div>
+          </div>
+          <% }) %>
+        </div>
+        <div style="text-align:center;margin-top:28px">
+          <a href="/videos" class="btn btn-outline">More Videos</a>
+        </div>
+      </section>
+      <% } %>
+
+    </div>
+
+    <!-- RIGHT: SIDEBAR -->
+    <aside class="sidebar">
+
+      <!-- POPULAR -->
+      <% if (popular.length) { %>
+      <div class="sidebar-block">
+        <div class="sidebar-block-title">🔥 People Are Talking</div>
+        <% popular.forEach((a, i) => { %>
+        <a href="/articles/<%= a.slug %>">
+          <div class="list-card">
+            <% if (a.cover_image) { %>
+              <div class="list-card-thumb"><img src="<%= a.cover_image %>" alt="" loading="lazy"></div>
+            <% } else { %>
+              <div style="width:80px;height:54px;background:var(--bg-hover);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🎮</div>
+            <% } %>
+            <div>
+              <div class="list-card-title"><%= a.title %></div>
+              <div class="list-card-meta"><%= a.views %> views</div>
+            </div>
+          </div>
+        </a>
+        <% }) %>
+      </div>
+      <% } %>
+
+      <!-- CATEGORIES -->
+      <div class="sidebar-block">
+        <div class="sidebar-block-title">🗂️ Browse by Vibe</div>
+        <% categories.forEach(c => { %>
+          <a href="/articles?category=<%= c.slug %>" style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:14px;color:var(--text-2);transition:color 0.2s" onmouseover="this.style.color='<%= c.color %>'" onmouseout="this.style.color='var(--text-2)'">
+            <span style="display:flex;align-items:center;gap:8px">
+              <span style="width:8px;height:8px;border-radius:50%;background:<%= c.color %>;flex-shrink:0"></span>
+              <%= c.name %>
+            </span>
+          </a>
+        <% }) %>
+      </div>
+
+      <!-- DISCORD CTA -->
+      <div class="sidebar-block" style="background:linear-gradient(135deg,#1a1530,#0e0b1e);border-color:rgba(163,0,58,0.3);text-align:center;padding:24px">
+        <img src="/img/wwg_yellow_logo.png" alt="WWG" class="wwg-logo" style="height:22px;width:auto;margin:0 auto 16px;display:block">
+        <div style="font-family:var(--font-display);font-size:18px;letter-spacing:3px;margin-bottom:8px;color:var(--gold)">HANG WITH US</div>
+        <p style="font-size:13px;color:var(--text-2);margin-bottom:16px;line-height:1.6">1000+ gamers on Discord. Voice chats, game nights, and way too many hot takes.</p>
+        <a href="<%= settings.discord_url || 'https://discord.gg/xpjv99H' %>" target="_blank" class="btn btn-primary" style="width:100%;justify-content:center;background:var(--gold);color:#0e0b1e;font-weight:800">Jump In</a>
+      </div>
+
+    </aside>
+  </div>
+</div>

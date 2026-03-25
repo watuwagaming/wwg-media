@@ -1,0 +1,99 @@
+<div class="container" style="padding-top:40px;padding-bottom:60px">
+
+  <div class="page-header">
+    <h1>
+      <% if (category) { %>
+        <%= categories.find(c => c.slug === category)?.name?.toUpperCase() || category.toUpperCase() %>
+      <% } else if (q) { %>
+        SEARCH RESULTS
+      <% } else { %>
+        ALL POSTS
+      <% } %>
+    </h1>
+    <p style="color:var(--text-2);font-size:15px">
+      <% if (q) { %>
+        <%= total %> result<%= total !== 1 ? 's' : '' %> for "<%= q %>"
+      <% } else if (category) { %>
+        <%= total %> post<%= total !== 1 ? 's' : '' %> in this vibe
+      <% } else { %>
+        <%= total %> post<%= total !== 1 ? 's' : '' %> from the community
+      <% } %>
+    </p>
+  </div>
+
+  <!-- SEARCH -->
+  <form class="search-form" action="/articles" method="GET">
+    <% if (category) { %><input type="hidden" name="category" value="<%= category %>"><% } %>
+    <input type="text" name="q" placeholder="Search posts..." value="<%= q || '' %>">
+    <button type="submit" class="btn btn-primary">Search</button>
+    <% if (q) { %><a href="/articles<%= category ? '?category=' + category : '' %>" class="btn btn-ghost">Clear</a><% } %>
+  </form>
+
+  <!-- CATEGORY FILTERS -->
+  <div class="cat-filter">
+    <a href="/articles" class="cat-filter-btn <%= !category ? 'active' : '' %>" style="<%= !category ? 'background:var(--crimson);border-color:var(--crimson);color:#fff' : '' %>">Everything</a>
+    <% categories.forEach(c => { %>
+      <a href="/articles?category=<%= c.slug %>"
+         class="cat-filter-btn <%= category === c.slug ? 'active' : '' %>"
+         style="<%= category === c.slug ? `background:${c.color};border-color:${c.color};color:#fff` : '' %>">
+        <%= c.name %>
+      </a>
+    <% }) %>
+  </div>
+
+  <!-- POSTS GRID -->
+  <% if (articles.length) { %>
+    <div class="card-grid card-grid-3">
+      <% articles.forEach(a => { %>
+      <a href="/articles/<%= a.slug %>">
+        <article class="article-card">
+          <div class="card-thumb">
+            <% if (a.cover_image) { %>
+              <img src="<%= a.cover_image %>" alt="<%= a.title %>" loading="lazy">
+            <% } else { %>
+              <div class="card-thumb-placeholder">🎮</div>
+            <% } %>
+          </div>
+          <div class="card-body">
+            <% if (a.cat_name) { %>
+              <span class="cat-badge" style="background:<%= a.cat_color %>20;color:<%= a.cat_color %>"><%= a.cat_name %></span>
+            <% } %>
+            <h3 class="card-title"><%= a.title %></h3>
+            <p class="card-excerpt"><%= excerpt(a.excerpt) %></p>
+            <div class="card-meta">
+              <span><%= a.author_name || 'Community' %></span>
+              <span>•</span>
+              <span><%= timeAgo(a.published_at) %></span>
+              <span style="margin-left:auto">👁 <%= a.views %></span>
+            </div>
+          </div>
+        </article>
+      </a>
+      <% }) %>
+    </div>
+
+    <!-- PAGINATION -->
+    <% if (pages > 1) { %>
+    <div class="pagination">
+      <% if (page > 1) { %>
+        <a href="?page=<%= page-1 %><%= category ? '&category='+category : '' %><%= q ? '&q='+encodeURIComponent(q) : '' %>" class="page-link">‹</a>
+      <% } %>
+      <% for (let i = 1; i <= pages; i++) { %>
+        <a href="?page=<%= i %><%= category ? '&category='+category : '' %><%= q ? '&q='+encodeURIComponent(q) : '' %>"
+           class="page-link <%= page === i ? 'active' : '' %>"><%= i %></a>
+      <% } %>
+      <% if (page < pages) { %>
+        <a href="?page=<%= page+1 %><%= category ? '&category='+category : '' %><%= q ? '&q='+encodeURIComponent(q) : '' %>" class="page-link">›</a>
+      <% } %>
+    </div>
+    <% } %>
+
+  <% } else { %>
+    <div class="empty-state">
+      <h3>NOTHING HERE YET</h3>
+      <p>No posts found<%= q ? ` for "${q}"` : '' %>. Be the first to post something in this vibe!</p>
+      <a href="/articles" class="btn btn-outline" style="margin-top:16px">See All Posts</a>
+    </div>
+  <% } %>
+
+</div>
